@@ -8,4 +8,5 @@ public class LogicConfig {
     public static final int ANGLE = 200;// represent whole FOV
     public static final double DEFAULT_DETECTION_RANGE = 8.6;
     public static final double SNEAK_RANGE = 4.8;
+    public static final int delayTicks = 16;
 }

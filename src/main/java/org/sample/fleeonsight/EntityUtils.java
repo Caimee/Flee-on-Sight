@@ -31,7 +31,7 @@ public class EntityUtils {
     }
 
     public static PlayerEntity getNearbyPlayer(ServerWorld world, MobEntity mob) {
-        return world.getClosestPlayer(mob, 42.0);
+        return world.getClosestPlayer(mob, 42.6);
     }
 
     // Retrieve or create the PlayerState for a given player

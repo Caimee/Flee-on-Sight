@@ -18,7 +18,7 @@ public interface AnimalStateMachine {
         double distance = animal.distanceTo(player);
 
         // Enter fleeing state
-        if (!MobState.isFleeing && distance <= playerState.detectionRange && FOVcheck(animal, player)) {
+        if (!MobState.isFleeing && distance <= playerState.detectionRange && FOVcheck(animal, player) && !MobState.isFriendly) {
             MobState.isFleeing = true;
         }
 

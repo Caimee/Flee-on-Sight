@@ -9,9 +9,10 @@ import org.sample.fleeonsight.LogicConfig;
 import java.util.function.Predicate;
 
 import static org.sample.fleeonsight.EntityUtils.getMobState;
+import static org.sample.fleeonsight.LogicConfig.delayTicks;
 
 /**
-  *Generic manager that spreads the fleeing state among herd animals.
+ * Generic manager that spreads the fleeing state among herd animals.
  */
 public class AnimalGroupFleeManager {
 
@@ -19,10 +20,22 @@ public class AnimalGroupFleeManager {
      * Generic method to spread fleeing behavior among animals of the same type.
      */
     public static <T extends AnimalEntity> void manageGroupFlee(T animal) {
+
         EntityType<?> type = animal.getType();
+        var state = getMobState(animal);
 
         // skip if the animal is not fleeing
-        if (!getMobState(animal).isFleeing) return;
+        if (!state.isFleeing) {
+            state.timer = 0;
+            return;
+        }
+
+        // increase timer up to max of 5
+        if (state.timer < delayTicks) {
+            state.timer++;
+            return;
+        }
+        //Todo: begin a initial timer once detect isFleeing = true
 
         var world = animal.getWorld();
 
@@ -35,11 +48,12 @@ public class AnimalGroupFleeManager {
 
         // Set fleeing state to each nearby animal that is not fleeing
         for (Entity other : nearby) {
-            var state = getMobState((MobEntity) other);
-            if (!state.isFleeing) {
-                state.isFleeing = true;
+            var otherState = getMobState((MobEntity) other);
+            if (!otherState.isFleeing) {
+                otherState.isFleeing = true;
             }
         }
+        state.timer = 0;
     }
 }
 

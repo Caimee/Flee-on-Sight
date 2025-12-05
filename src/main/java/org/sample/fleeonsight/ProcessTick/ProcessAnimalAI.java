@@ -30,23 +30,39 @@ public class ProcessAnimalAI {
 
     // Generic method to process AI for a group of animals
     public static void processAI(ServerWorld world, List<? extends AnimalEntity> animalGroup) {
+
         if (animalGroup == null || animalGroup.isEmpty()) {
             return;
         }
-        AnimalStateMachine aiHandler = getAnimalAI(animalGroup. get(0));
+
+        // Get the appropriate AI handler for the animal type
+        AnimalStateMachine aiHandler = getAnimalAI(animalGroup.get(0));
+
         for (AnimalEntity animal : animalGroup) {
+
+            // Find the nearest player
             PlayerEntity player = getNearbyPlayer(world, animal);
             if (player == null) {
                 continue;
             }
+
+            // Retrieve states
             PlayerState playerState = getPlayerState(player);
+            MobState animalState = getMobState(animal);
+
+            // Update states
             PlayerStateMachine.updateSneakingState(player, playerState);
             PlayerStateMachine.playerStateExecute(playerState);
-            MobState animalState = getMobState(animal);
+
+            // Update animal states based on player state
             aiHandler.updateFriendlyState(animal, player, animalState);
             aiHandler.updateFleeingState(animal, player, animalState, playerState);
+
+            // Manage group fleeing behavior
             AnimalGroupFleeManager.manageGroupFlee(animal);
-            if (!animalState.isFriendly && animalState.isFleeing) {
+
+            // Execute fleeing logic if applicable
+            if (animalState.isFleeing) {
                 aiHandler.applyFlee_logic(animal, player);
             }
         }

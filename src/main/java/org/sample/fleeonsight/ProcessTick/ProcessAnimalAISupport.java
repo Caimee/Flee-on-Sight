@@ -8,6 +8,8 @@ import org.sample.fleeonsight.AnimalSystem.AnimalStateMachine.SheepStateMachine;
 
 // Provides access to different animal AI state machines
 public class ProcessAnimalAISupport {
+
+    // Pre-instantiate state machines for different animal types
     private final static SheepStateMachine SheepAI = new SheepStateMachine();
     private final static PigStateMachine PigAI = new PigStateMachine();
     private final static CowStateMachine CowAI = new CowStateMachine();
