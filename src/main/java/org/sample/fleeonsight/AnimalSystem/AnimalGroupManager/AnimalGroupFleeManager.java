@@ -4,10 +4,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import org.sample.fleeonsight.LogicConfig;
 
 import java.util.function.Predicate;
 
+import static org.sample.fleeonsight.AnimalSystem.Animalstate.State.FLEEING;
 import static org.sample.fleeonsight.EntityUtils.getMobState;
 import static org.sample.fleeonsight.LogicConfig.delayTicks;
 
@@ -19,13 +21,13 @@ public class AnimalGroupFleeManager {
     /**
      * Generic method to spread fleeing behavior among animals of the same type.
      */
-    public static <T extends AnimalEntity> void manageGroupFlee(T animal) {
+    public static <T extends AnimalEntity> void manageGroupFlee(T animal, PlayerEntity player) {
 
         EntityType<?> type = animal.getType();
         var state = getMobState(animal);
 
         // skip if the animal is not fleeing
-        if (!state.isFleeing) {
+        if (!(state.currentState == FLEEING)) {
             state.timer = 0;
             return;
         }
@@ -48,9 +50,9 @@ public class AnimalGroupFleeManager {
         // Set fleeing state to each nearby animal that is not fleeing
         for (Entity other : nearby) {
             var otherState = getMobState((MobEntity) other);
-            if (!otherState.isFleeing) {
-                otherState.isGroupStartled = true;
-                otherState.isPlayerDetected = true;
+            if (!(otherState.currentState == FLEEING)) {
+                otherState.currentState = FLEEING;
+                ((MobEntity) other).setAttacker(player);
             }
         }
         state.timer = 0;

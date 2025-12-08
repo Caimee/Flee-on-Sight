@@ -6,6 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.Vec3d;
 import org.sample.fleeonsight.AnimalSystem.Animalstate.MobState;
 
+import static org.sample.fleeonsight.AnimalSystem.Animalstate.State.*;
 import static org.sample.fleeonsight.LogicConfig.DEFAULT_DETECTION_RANGE;
 import static org.sample.fleeonsight.LogicConfig.FLEE_SPEED;
 
@@ -13,12 +14,31 @@ import static org.sample.fleeonsight.LogicConfig.FLEE_SPEED;
 public class PigStateMachine implements AnimalStateMachine {
 
     @Override
-    public void updateFriendlyState(LivingEntity pig, PlayerEntity player, MobState state) {
-        if (!state.isFriendly && FOVcheck(pig, player) && (player.isHolding(Items.CARROT) || player.isHolding(Items.POTATO) || player.isHolding(Items.BEETROOT)) && (pig.distanceTo(player) < DEFAULT_DETECTION_RANGE + 0.2)) {
-            state.isFriendly = true;//entry friendly state
-        }
-        if (state.isFriendly && pig.getAttacker() == player) {
-            state.isFriendly = false;//exit friendly state
+    public void updateStates(LivingEntity pig, PlayerEntity player, MobState mobState, org.sample.fleeonsight.PlayerSystem.PlayerState playerState) {
+        double distance = pig.distanceTo(player);
+        switch (mobState.currentState){
+            case DEFAULT_EMPTY:
+                if((player.isHolding(Items.CARROT) || player.isHolding(Items.POTATO) || player.isHolding(Items.BEETROOT) || player.isHolding(Items.CARROT_ON_A_STICK)) && distance <= DEFAULT_DETECTION_RANGE + 0.2){
+                    mobState.currentState = FRIENDLY;
+                }
+
+                else if(distance <= playerState.detectionRange && FOVcheck(pig, player)){
+                    mobState.currentState = FLEEING;
+                }
+                break;
+
+            case FRIENDLY:
+                if(pig.getAttacker() == player){
+                    mobState.currentState = FLEEING;
+                }
+                break;
+
+            case FLEEING:
+                if(distance >= org.sample.fleeonsight.LogicConfig.STOP_RANGE){
+                    mobState.currentState = DEFAULT_EMPTY;
+                    pig.setAttacker(player);
+                }
+                break;
         }
     }
 

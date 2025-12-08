@@ -8,58 +8,36 @@ import net.minecraft.util.math.Vec3d;
 import org.sample.fleeonsight.PlayerSystem.PlayerState;
 import org.sample.fleeonsight.AnimalSystem.Animalstate.MobState;
 
+import static org.sample.fleeonsight.AnimalSystem.Animalstate.State.*;
 import static org.sample.fleeonsight.LogicConfig.*;
 
 // Interface defining the state machine behavior for animals
 public interface AnimalStateMachine {
 
-    //logic of fleeing state machine
-    default void updateFleeingState(LivingEntity animal, PlayerEntity player, MobState MobState) {
-
-        // Enter fleeing state
-        if (!MobState.isFleeing && ((MobState.isPlayerDetected && !MobState.isFriendly)|| MobState.isGroupStartled)) {
-            MobState.isFleeing = true;
-        }
-
-        // Exit fleeing state
-        if(MobState.isFleeing && !MobState.isPlayerDetected){
-            MobState.isFleeing = false;
-            animal.setAttacker(player);
-        }
-        if (MobState.isFleeing && MobState.isFriendly) {
-            MobState.isFleeing = false;
-        }
-    }
-
-    default void updatePlayerDetectedState(LivingEntity animal, PlayerEntity player,MobState MobState, PlayerState playerState) {
+    default void updateStates(LivingEntity animal, PlayerEntity player, MobState mobState, PlayerState playerState){
         double distance = animal.distanceTo(player);
+        switch (mobState.currentState){
+            case DEFAULT_EMPTY:
+                if(player.isHolding(Items.WHEAT) && distance <= DEFAULT_DETECTION_RANGE + 0.2){
+                    mobState.currentState = FRIENDLY;
+                }
+                else if(distance <= playerState.detectionRange && FOVcheck(animal, player)){
+                    mobState.currentState = FLEEING;
+                }
+                break;
 
-        if (!MobState.isPlayerDetected && distance <= playerState.detectionRange && FOVcheck(animal, player) ) {
-            MobState.isPlayerDetected = true;
-        }
+            case FRIENDLY:
+                if(animal.getAttacker() == player){
+                    mobState.currentState = FLEEING;
+                }
+                break;
 
-        if (MobState.isPlayerDetected && distance >= STOP_RANGE) {
-            MobState.isPlayerDetected = false;
-        }
-    }
-
-    default void updateGroupStartledState(MobEntity animal, MobState MobState) {
-        if (MobState.isGroupStartled) {
-            MobState.isGroupStartled = false;
-        }
-    }
-
-    //logic of friendly state machine
-    default void updateFriendlyState(LivingEntity animal, PlayerEntity player, MobState state) {
-
-        // Enter friendly state
-        if (!state.isFriendly  && FOVcheck(animal, player) && player.isHolding(Items.WHEAT) && (animal.distanceTo(player) < DEFAULT_DETECTION_RANGE + 0.2)) {
-            state.isFriendly = true;//entry friendly state
-        }
-
-        // Exit friendly state
-        if (state.isFriendly && animal.getAttacker() == player) {
-            state.isFriendly = false;
+            case FLEEING:
+                if(distance >= STOP_RANGE){
+                    mobState.currentState = DEFAULT_EMPTY;
+                    animal.setAttacker(player);
+                }
+                break;
         }
     }
 
