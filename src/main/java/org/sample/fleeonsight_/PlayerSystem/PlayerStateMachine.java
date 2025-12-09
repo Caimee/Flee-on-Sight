@@ -9,7 +9,7 @@ import static org.sample.fleeonsight_.LogicConfig.SNEAK_RANGE;
 public class PlayerStateMachine {
 
     // logic of sneaking state machine
-    public static void updateSneakingState(PlayerEntity player, PlayerState state) {
+    public static void updateSneakingState(PlayerEntity player, org.sample.fleeonsight_.PlayerSystem.PlayerState state) {
         //Enter sneaking state
         if (!state.isSneaking && player.isSneaking()) {
             state.isSneaking = true;
@@ -22,7 +22,7 @@ public class PlayerStateMachine {
     }
 
     // execute player state effects
-    public static void playerStateExecute(PlayerState state) {
+    public static void playerStateExecute(org.sample.fleeonsight_.PlayerSystem.PlayerState state) {
         if (state.isSneaking) {
             state.detectionRange = SNEAK_RANGE;
         }

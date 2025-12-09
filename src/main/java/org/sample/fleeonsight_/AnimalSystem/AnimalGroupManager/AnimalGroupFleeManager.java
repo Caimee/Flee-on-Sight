@@ -8,6 +8,7 @@ import org.sample.fleeonsight_.LogicConfig;
 
 import java.util.function.Predicate;
 
+import static org.sample.fleeonsight_.AnimalSystem.Animalstate.State.FLEEING;
 import static org.sample.fleeonsight_.EntityUtils.getMobState;
 import static org.sample.fleeonsight_.LogicConfig.delayTicks;
 
@@ -25,7 +26,7 @@ public class AnimalGroupFleeManager {
         var state = getMobState(animal);
 
         // skip if the animal is not fleeing
-        if (!state.isFleeing) {
+        if (!(state.currentState == FLEEING)) {
             state.timer = 0;
             return;
         }
@@ -48,8 +49,8 @@ public class AnimalGroupFleeManager {
         // Set fleeing state to each nearby animal that is not fleeing
         for (Entity other : nearby) {
             var otherState = getMobState((MobEntity) other);
-            if (!otherState.isFleeing) {
-                otherState.isFleeing = true;
+            if (!(otherState.currentState == FLEEING)) {
+                otherState.currentState = FLEEING;
             }
         }
         state.timer = 0;

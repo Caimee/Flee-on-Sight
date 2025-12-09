@@ -13,6 +13,8 @@ import java.util.WeakHashMap;
 
 import static org.sample.fleeonsight_.ProcessTick.ProcessAnimalAI.*;
 
+//Todo: support mod menu and config file for these parameters
+
 public class Fleeonsight_ implements ModInitializer {
     public static final String MOD_ID = "FleeOnSight";
     public static WeakHashMap<MobEntity, MobState> MobStates = new WeakHashMap<>();// Store mob states with weak references

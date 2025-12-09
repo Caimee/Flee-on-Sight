@@ -12,6 +12,7 @@ import org.sample.fleeonsight_.PlayerSystem.PlayerStateMachine;
 
 import java.util.List;
 
+import static org.sample.fleeonsight_.AnimalSystem.Animalstate.State.FLEEING;
 import static org.sample.fleeonsight_.EntityUtils.*;
 import static org.sample.fleeonsight_.ProcessTick.ProcessAnimalAISupport.*;
 
@@ -55,14 +56,13 @@ public class ProcessAnimalAI {
             PlayerStateMachine.playerStateExecute(playerState);
 
             // Update animal states based on player state
-            aiHandler.updateFriendlyState(animal, player, animalState);
-            aiHandler.updateFleeingState(animal, player, animalState, playerState);
+            aiHandler.updateStates(animal, player, animalState, playerState);
 
             // Manage group fleeing behavior
             AnimalGroupFleeManager.manageGroupFlee(animal);
 
             // Execute fleeing logic if applicable
-            if (animalState.isFleeing) {
+            if (animalState.currentState == FLEEING) {
                 aiHandler.applyFlee_logic(animal, player);
             }
         }
